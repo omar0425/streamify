@@ -1,0 +1,55 @@
+.form {
+  padding-top: 10em;
+}
+
+.login {
+  max-width: 300px;
+  padding: 70px;
+  margin-left: auto;
+  margin-right: auto;
+
+  background: black;
+  color: white;
+}
+
+.login-button {
+  color: black;
+  border-radius: 99px;
+  font-weight: 600;
+  background-color: white;
+  font-size: 20px;
+  width: 300px;
+  height: 40px;
+  margin-bottom: 1em;
+}
+
+.signup-button {
+  color: black;
+  border-radius: 99px;
+  font-weight: 600;
+  background-color: white;
+  font-size: 20px;
+  width: 300px;
+  height: 40px;
+  margin-bottom: 1em;
+}
+
+.login input {
+  margin-bottom: 1em;
+}
+
+.login > form {
+  display: grid;
+  flex-direction: column;
+}
+
+::placeholder {
+  color: black;
+  opacity: 1; /* Firefox */
+}
+.login__logo {
+  text-align: center;
+}
+input {
+  font-size: 20px;
+}
