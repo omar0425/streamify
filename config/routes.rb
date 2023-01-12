@@ -1,14 +1,17 @@
 Rails.application.routes.draw do
-  resources :artists
-  resources :albums
-  resources :songs
-  resources :playlists
-  resources :users
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  resources :spotify_api, only: [:show]
+  resources :artists, only: [:index, :show, :create, :update, :destroy]
+  resources :albums, only: [:index, :show, :create, :update, :destroy]
+  resources :songs, only: [:index, :show, :create, :update, :destroy]
+  resources :playlists, only: [:index, :show, :create, :update, :destroy]
+  resources :users, only: [:create]
 
-  # Defines the root path route ("/")
-  # root "articles#index"
-  get '/hello', to: 'application#hello_world'
+  get '/me', to: "sessions#show"
+  post '/login', to: "sessions#create"
+  delete "/logout", to: "sessions#destroy"
+
+  get "auth/spotify/callback", to: "spotify_api#callback"
+  
   get '*path',
   to: 'fallback#index',
   constraints: ->(req) { !req.xhr? && req.format.html? }
