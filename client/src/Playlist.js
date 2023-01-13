@@ -32,7 +32,7 @@ function Playlist() {
   console.log("form", form)
   
   useEffect(() => {
-    if (currentPlaylist) {
+    if (!!currentPlaylist) {
       fetch(`/playlists/${params.id}`)
       .then((res) => {
         if (res.ok) {

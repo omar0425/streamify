@@ -12,6 +12,8 @@ class SpotifyApiController < ApplicationController
   end
 
   def callback
-    byebug
+    spotify_user = RSpotify::User.new(request.env['omniauth.auth'])
+    puts spotify_user
+    # byebug
   end
 end

@@ -34,3 +34,4 @@
 /config/credentials/production.yml.enc
 
 
+node_modules

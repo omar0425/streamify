@@ -33,7 +33,7 @@ function Navbar() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({instructions: "Make a new playlist, bitch!"})
+      body: JSON.stringify({instructions: "Make a new playlist"})
     }).then((response) => {
       if (response.ok) {
         response.json().then((newPlaylist) => {
