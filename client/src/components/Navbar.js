@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 // material ui components
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import { Avatar } from "@mui/material";
 import Button from '@mui/material/Button';
 import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
@@ -23,22 +24,25 @@ import SidebarOption from "../SidebarOption";
 
 
 function Navbar() {
+  //sets state, context and navigate hooks
   const [errors, setErrors] = useState([])
-  const { setUser, setCurrentPlaylist } = useContext(SpotifyContext);
+  const { setCurrentPlaylist, localUser, setLocalUser } = useContext(SpotifyContext);
   const navigate = useNavigate();
 
+  // creates and sets a brand new playlist with default values and sets state with the new playlist
   function handleCreateAndRouteToPlaylist() {
     fetch('/playlists', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({instructions: "Make a new playlist"})
+      body: JSON.stringify({ instructions: "Make a new playlist, bitch!" })
     }).then((response) => {
       if (response.ok) {
         response.json().then((newPlaylist) => {
           setCurrentPlaylist(newPlaylist)
-          navigate(`/playlists/${newPlaylist.id}`)
+          setLocalUser({...localUser, playlists: [...localUser.playlists, newPlaylist]})
+          setTimeout(navigate(`/playlists/${newPlaylist.id}`), 1000)
         });
       } else {
         response.json().then((err) => setErrors(err.errors));
@@ -46,10 +50,37 @@ function Navbar() {
     })
   }
 
+  //sort and map over users playlists and list them as links
+  const ListUserPlaylists = () => {
+    console.log("listUserPlaylists is firing localUser", localUser)
+    let updatedPlaylistLinks = localUser.playlists
+      .sort((a, b) => a.id - b.id)
+      .map((playlist) => {
+        console.log("just before the return fires")
+      return (
+        <Link
+          to={`playlists/${playlist.id}`}
+          className='sidebarPlaylists'
+          key={playlist.name}
+        >
+          <Avatar
+            src={playlist.image}
+            className="sidebarOption_icon"
+          />
+          <h4>{playlist.name}</h4>
+        </Link>
+      )
+    })
+    return updatedPlaylistLinks
+  }
+
+  function reload() {
+    window.location.reload();
+  }
 
   return (
     <div className='sidebar'>
-      <h1 className='logo'>🎶Fakeify&reg;</h1>
+      <h1 className='logo' onClick={() => {reload()}}>🎶Fakeify&reg;</h1>
       <Link to="/home" className='sidebarOption'>
         <HomeIcon className="sidebarOption_icon" />
         <h4>Home</h4>
@@ -62,7 +93,7 @@ function Navbar() {
         <LibraryMusicIcon className="sidebarOption_icon" />
         <h4>My Library</h4>
       </Link>
-      <a component='a' href="http://localhost:3000/auth/spotify" className='sidebarOption' >
+      <a component='a' href="http://localhost:3000/auth/spotify" className='sidebarOption' onClick={() => {console.log("a link is being fired")}}>
         <LoginIcon className="sidebarOption_icon" />
         <h4>Sign in with Spotify</h4>
       </a>
@@ -76,41 +107,17 @@ function Navbar() {
         }}
         onClick={handleCreateAndRouteToPlaylist}
       >
-        <AddBoxIcon className="sidebarOption_icon" />
-        <h4>Create A Playlist</h4>
+        <AddBoxIcon
+          className="sidebarOption_icon"
+        />
+        <h4 >Create A Playlist</h4>
       </Button>
-      {/* <Link to={`playlist/${playlist.id}`} className="sidebarOption">
-        <AddBoxIcon className="sidebarOption_icon" />
-        <h4>Create A Playlist</h4>
-      </Link> */}
 
-
-
-      {/* <Button className='sidebarOption' 
-        sx={{color: 'grey', 
-          textTransform: 'none',
-          height: '30px',
-          marginLeft: '-8px',
-          fontSize: '16px',
-        }}
-        onClick={handleSpotifyLogin}
-      >
-        
-        <h4>Login with Spotify</h4>
-      </Button> */}
-
-<Typography variant="h6" className='sidebar_title' sx={{marginTop: '2em', color: 'grey'}}>
-My Playlists 
+      <Typography variant="h6" className='sidebar_title' sx={{ marginTop: '2em', color: 'grey' }}>
+        My Playlists
       </Typography>
       <hr />
-      {/* {playlists?.items?.map(playlist =>(
-        <sidebarOption title={playlist.name}/>
-      ))} */}
-
-      {/* Hardcoded for now 👇*/}
-      <SidebarOption title='Hip Hop' />
-      <SidebarOption title='Rock' />
-      <SidebarOption title='Rnb' />
+      <ListUserPlaylists />
     </div>
   )
 }
