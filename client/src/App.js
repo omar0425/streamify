@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { SpotifyContext } from "./SpotifyContext";
-import CssBaseline from "@mui/material/CssBaseline";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
+import CssBaseline from '@mui/material/CssBaseline';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
 
 // importing components and css
 import "./App";
@@ -16,17 +16,17 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import LoginToSpotify from "./LoginToSpotify";
 import Navbar from "./components/Navbar";
-import Player from "./Player";
+import Profile from "./components/Profile";
 import Playlist from "./Playlist";
-import Body from "./Body";
 
 // importing material ui components
 import Search from "@mui/icons-material/Search";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState({});
+  const [localUser, setLocalUser] = useState({});
   const [currentPlaylist, setCurrentPlaylist] = useState({});
+  const [spotifyUser, setSpotifyUser] = useState('');
 
   // checks the browser session for a logged in user and automatically logs them in
   useEffect(() => {
@@ -34,7 +34,7 @@ const App = () => {
       if (response.ok) {
         response.json().then((user) => {
           setIsAuthenticated(true);
-          setUser(user);
+          setLocalUser(user);
         });
       }
     });
@@ -42,7 +42,7 @@ const App = () => {
 
   if (!isAuthenticated)
     return (
-      <SpotifyContext.Provider value={{ setIsAuthenticated, setUser }}>
+      <SpotifyContext.Provider value={{ setIsAuthenticated, setLocalUser }}>
         <Login />
       </SpotifyContext.Provider>
     );
@@ -50,38 +50,46 @@ const App = () => {
   return (
     <Router>
       <SpotifyContext.Provider
-        value={{
-          isAuthenticated,
-          setIsAuthenticated,
-          user,
-          setUser,
-          currentPlaylist,
+        value={{ 
+          isAuthenticated, 
+          setIsAuthenticated, 
+          localUser, 
+          setLocalUser, 
+          currentPlaylist, 
           setCurrentPlaylist,
+          spotifyUser,
+          setSpotifyUser
         }}
       >
         <Grid container>
-          <Grid item>
-            <Navbar />
+
+          <Grid item >
+          <Navbar />
           </Grid>
 
-          <Grid item sx={{ flexGrow: 1 }}>
-            <Header />
+          <Grid item sx={{flexGrow: 1}}>
+            <Header /> 
             <Routes>
-              <Route path='/' element={<Home />} />
-              {/* <Route path='/search' element={<Search />} /> */}
-              <Route path='/playlists/:id' element={<Playlist />} />
+              <Route index element={<Home />} />
+              <Route path="/home" element={<Home />} />
+              <Route path='/search' element={<Search />} />
+              <Route path="/playlists/:id" element={<Playlist />} />
+              <Route path="/profile" element={<Profile />} />
               {/* <Route path='/collection/' element={<CollectionHeader />} >
                 <Route path='playlists' element={<Playlists />} />
                 <Route path='songs' element={<Songs />} />
-              </Route> */}
+              </Route> */}              
             </Routes>
           </Grid>
         </Grid>
 
-        {/* <Footer /> */}
+        <Footer />
+
       </SpotifyContext.Provider>
     </Router>
   );
 };
+
+export default App;
 
 export default App;
