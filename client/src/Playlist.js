@@ -1,6 +1,6 @@
 //functional imports
 import React, { useState, useContext, useEffect } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { SpotifyContext } from "./SpotifyContext";
 
 // css and component imports
@@ -17,172 +17,379 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
+import InputAdornment from '@mui/material/InputAdornment';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import InputBase from '@mui/material/InputBase';
+import ClearIcon from '@mui/icons-material/Clear';
+import SearchIcon from '@mui/icons-material/Search';
+import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+
+
 
 function Playlist() {
-  const { currentPlaylist, setCurrentPlaylist, user } = useContext(SpotifyContext);
-  const [tracks, setTracks] = useState([])
-  const [errors, setErrors] = useState([])
+  // sets state, params, navigate and context
+  const { currentPlaylist, setCurrentPlaylist, localUser, setLocalUser } = useContext(SpotifyContext);
+  const [errors, setErrors] = useState([]);
+  const [form, setForm] = useState(currentPlaylist);
   const [open, setOpen] = useState(false);
-  const params = useParams()
-  const [form, setForm] = useState(currentPlaylist)
-  
-  console.log(currentPlaylist)
-  console.log("form", form)
-  
+  const [search, setSearch] = useState('');
+  const [tracks, setTracks] = useState([]);
+  const params = useParams();
+  const navigate = useNavigate();
+
+  // sets the playlist from the id in the url
   useEffect(() => {
-    if (!!currentPlaylist) {
-      fetch(`/playlists/${params.id}`)
-      .then((res) => {
-        if (res.ok) {
-            res.json().then((playlist) => setCurrentPlaylist(playlist))
-          } else {
-            res.json().then((err) => setErrors(err.errors));
-          }
-        })
-      }
-    }, [])
-    
-    useEffect(() => {
-      setForm(currentPlaylist)
-    }, [currentPlaylist])
-    
-    function handleSave (e) {
-      e.preventDefault()
-      fetch(`/playlists/${currentPlaylist.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: form.name,
-          description: form.description,
-          image: form.image
-        })
-      }).then((res) => {
-        if (res.ok) {
-          res.json().then((updatedPlaylist) => {
-            setCurrentPlaylist(updatedPlaylist)
-          });
-        } else {
-          res.json().then((err) => {
-            setErrors(err.error)});
+    if (params.id.length < 20) {
+      let thisPagesPlaylist = localUser.playlists.find((playlist) => {
+        if (playlist.id.toString() === params.id) {
+          return playlist
         }
       })
+      setCurrentPlaylist(thisPagesPlaylist)
+    }
+  }, [params, localUser])
+
+  //sets the form in state used in updating from the currentplaylist
+  useEffect(() => {
+    setForm(currentPlaylist)
+  }, [currentPlaylist])
+
+  // sends the updates attributes of the playlist to the backend and updates state with the updated playlist
+  function handleSave(e) {
+    e.preventDefault()
+    fetch(`/playlists/${currentPlaylist.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: form.name,
+        description: form.description,
+        image: form.image
+      })
+    }).then((res) => {
+      if (res.ok) {
+        res.json().then((updatedPlaylist) => {
+          setCurrentPlaylist(updatedPlaylist)
+          let updatedPlaylists = localUser.playlists.map((pl) => {
+            if (params.id === pl.id.toString()) {
+              return updatedPlaylist
+            } else {
+              return pl
+            }
+          })
+          setLocalUser({ ...localUser, playlists: updatedPlaylists })
+        });
+      } else {
+        res.json().then((err) => {
+          setErrors(err.error)
+        });
+      }
+    })
+    setOpen(false);
+  }
+
+  // adds track to currentplaylist then updates state with the updated playlist from the backend
+  function handleAddTrack(track) {
+    fetch(`/playlists/${currentPlaylist.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ trackId: track.id })
+    }).then((res) => {
+      if (res.ok) {
+        res.json().then((updatedPlaylist) => {
+          setCurrentPlaylist(updatedPlaylist)
+          let updatedPlaylists = localUser.playlists.map((pl) => {
+            if (params.id === pl.id) {
+              return updatedPlaylist
+            } else {
+              return pl
+            }
+          })
+          setLocalUser({ ...localUser, playlists: [updatedPlaylists] })
+        });
+      } else {
+        res.json().then((err) => {
+          setErrors(err.error)
+        });
+      }
+    })
+  }
+
+  // deletes the current playlist and updates states by removing it
+  function handleDeletePlaylist(e) {
+    e.preventDefault()
+    fetch(`/playlists/${currentPlaylist.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(),
+    }).then((res) => {
+      if (res.ok) {
+        let updatedPlaylists = localUser.playlists.filter((pl) => currentPlaylist.id !== pl.id)
+        setLocalUser({ ...localUser, playlists: updatedPlaylists })
+        setCurrentPlaylist({})
+        navigate("/home")
+      } else {
+        res.json().then((err) => {
+          setErrors(err.errors)
+        });
+      }
+    })
+    handleCloseDeleteMenu()
+  }
+  
+  //handles the search submit 
+  function handleSearchSubmit(e) {
+    e.preventDefault()
+    fetch(`/spotify_api/songs/${search}`)
+      .then((res) => {
+        if (res.ok) {
+          res.json().then((tracks) => {
+            setTracks(tracks)
+          })
+        } else {
+          res.json().then((err) => {
+            setErrors(err.error)
+          });
+        }
+      })
+      setSearch('')
     }
 
-    function handleDialogUpdate (e) {
-      setForm({...form, [e.target.name]: e.target.value})
+    //updates the form in state with the changed input values from the form
+    function handleDialogUpdate(e) {
+      setForm({ ...form, [e.target.name]: e.target.value })
     }
   
+    //handles opening and closing the form
     const handleClickOpen = () => {
       setOpen(true);
     };
-  
     const handleClose = () => {
       setOpen(false);
+      setForm(currentPlaylist)
     };
 
+  //updates state held search value for song search input
+  function handleSearchInputChange(e) {
+    setSearch(e.target.value)
+  }
+
+  console.log("tracks", tracks)
+
+  //menu open and close handling for the delete threedot button
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openDeletePlaylist = Boolean(anchorEl);
+  const handleOpenDeleteMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseDeleteMenu = () => {
+    setAnchorEl(null);
+  };
+
+  // clear input value in update form in dialog
+  const handleFormNameClear = (val) => {
+    setForm({ ...form, [val]: '' })
+  }
+
   return (
-    <Grid className="body">
-      <div className="body__info">
-        {errors.map((error) => {
-          return (
-            <span key={error} className='error'>
-              {error}
-            </span>
-          );
-        })}
+    <>
+      {/* playlist information */}
+      <Grid container className="body">
+        <div className="body__info">
+          {errors.map((error) => {
+            return (
+              <span key={error} className='error'>
+                {error}
+              </span>
+            );
+          })}
+          <div onClick={handleClickOpen} >
+            <img className="image_class" src={currentPlaylist.image} alt={currentPlaylist.name} />
+          </div>
+          <div className="body__infoText" onClick={handleClickOpen}>
+            <h4>{currentPlaylist.name}</h4>
+            <p>{currentPlaylist.description}</p>
+            <p>{`${localUser.username}'s playlist`}</p>
+          </div>
 
-        <div onClick={handleClickOpen} >
+          {/* dialog for update menu */}
+          <div>
+            <Dialog
+              open={open}
+              onClose={handleClose}
+              sx={{ backgroundColor: 'transparent' }}
+            >
+              <DialogTitle
+                sx={{ backgroundColor: '#3b3637', color: 'white' }}
+              >Edit and update the details</DialogTitle>
+              <DialogContent
+                sx={{ backgroundColor: '#3b3637' }}
+              >
+                <DialogContentText
+                  sx={{ color: 'white' }}
+                >
+                  Change the information below and click save to update your playlist!
+                </DialogContentText>
+                <TextField
+                  sx={{ input: { color: 'white' } }}
+                  margin="dense"
+                  name="name"
+                  fullWidth
+                  variant="standard"
+                  onChange={handleDialogUpdate}
+                  value={form.name}
+                  InputProps={{
+                    endAdornment: (
+                      <div >
+                        <InputAdornment>
+                          <IconButton onClick={() => { handleFormNameClear('name') }}>
+                            <ClearIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      </div>
+                    )
+                  }}
+                />
+                <TextField
+                  sx={{ input: { color: 'white' } }}
+                  margin="dense"
+                  name="description"
+                  fullWidth
+                  variant="standard"
+                  onChange={handleDialogUpdate}
+                  value={form.description}
+                  InputProps={{
+                    endAdornment: (
+                      <div >
+                        <InputAdornment>
+                          <IconButton onClick={() => { handleFormNameClear('description') }}>
+                            <ClearIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      </div>
+                    )
+                  }}
+                />
+                <TextField
+                  sx={{ input: { color: 'white' } }}
+                  margin="dense"
+                  name="image"
+                  fullWidth
+                  variant="standard"
+                  onChange={handleDialogUpdate}
+                  value={form.image}
+                  InputProps={{
+                    endAdornment: (
+                      <div >
+                        <InputAdornment>
+                          <IconButton onClick={() => { handleFormNameClear('image') }}>
+                            <ClearIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      </div>
+                    )
+                  }}
+                />
+              </DialogContent>
+              <DialogActions
+                sx={{ backgroundColor: '#3b3637' }}
+              >
+                <Button onClick={handleClose}
+                  sx={{ color: 'white' }}
+                >Cancel</Button>
+                <Button onClick={handleSave}
+                  sx={{ color: 'white' }}
+                >Save</Button>
+              </DialogActions>
+            </Dialog>
+          </div>
+        </div>
+      </Grid>
 
-        <img className="image_class" src={currentPlaylist.image} alt={currentPlaylist.name} />
-        </div>
-        <div className="body__infoText" onClick={handleClickOpen}>
-          <h4>{currentPlaylist.name}</h4>
-          <p>{currentPlaylist.description}</p>
-          <p>{`${user.username}'s playlist`}</p>
-        </div>
-    <div>
-      <Dialog 
-        open={open} 
-        onClose={handleClose} 
-        sx={{backgroundColor: 'transparent'}}
-      >
-        <DialogTitle
-          sx={{backgroundColor: '#3b3637', color: 'white'}}
-        >Edit and update the details</DialogTitle>
-        <DialogContent
-          sx={{backgroundColor: '#3b3637'}}
-        >
-          <DialogContentText 
-            sx={{color: 'white'}}
+      {/* delete icon and menu */}
+      <Grid container>
+        <Grid item>
+          <div>
+            <IconButton
+              aria-label="more"
+              id="long-button"
+              aria-controls={openDeletePlaylist ? 'long-menu' : undefined}
+              aria-expanded={openDeletePlaylist ? 'true' : undefined}
+              aria-haspopup="true"
+              onClick={handleOpenDeleteMenu}
+            >
+              <MoreHorizIcon
+                sx={{
+                  marginLeft: '30px',
+                  height: '40px',
+                  marginTop: '-50px',
+                  color: 'white',
+                }}
+              />
+            </IconButton>
+            <Menu
+              id="long-menu"
+              MenuListProps={{
+                'aria-labelledby': 'long-button',
+              }}
+              anchorEl={anchorEl}
+              open={openDeletePlaylist}
+              onClose={handleCloseDeleteMenu}
+            >
+              <MenuItem onClick={handleDeletePlaylist}>
+                Delete Playlist
+              </MenuItem>
+            </Menu>
+          </div>
+
+          {/* search menu in playlist page to list songs to add */}
+          <Paper
+            component="form"
+            onSubmit={(e) => handleSearchSubmit(e)}
+            elevation={0}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              width: 250,
+              marginLeft: '2em',
+              backgroundColor: 'grey'
+            }}
           >
-            Change the information below and click save to update your playlist!
-          </DialogContentText>
-          <TextField
-            sx={{ input: { color: 'white' } }}
-            margin="dense"
-            name="name"
-            fullWidth
-            variant="standard"
-            onChange={handleDialogUpdate}
-            value={form.name}
-          />
-          <TextField
-            sx={{ input: { color: 'white' } }}
-            margin="dense"
-            name="description"
-            fullWidth
-            variant="standard"
-            onChange={handleDialogUpdate}
-            value={form.description}
-          />
-          <TextField
-            sx={{ input: { color: 'white' } }}
-            margin="dense"
-            name="image"
-            fullWidth
-            variant="standard"
-            onChange={handleDialogUpdate}
-            value={form.image}
-          />
-        </DialogContent>
-        <DialogActions
-          sx={{backgroundColor: '#3b3637'}}
-        >
-          <Button onClick={handleClose}
-            sx={{color: 'white'}}
-          >Cancel</Button>
-          <Button onClick={handleSave}
-            sx={{color: 'white'}}
-          >Save</Button>
-        </DialogActions>
-      </Dialog>
+            <InputBase
+              sx={{ ml: 1, flex: 1 }}
+              placeholder="Search for Songs, Artists or Albums"
+              type='text'
+              name='search'
+              value={search}
+              onChange={handleSearchInputChange}
+            />
+            <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
+              <SearchIcon onClick={(e) => handleSearchSubmit(e)} />
+            </IconButton>
+          </Paper>
+        </Grid>
 
-          
-        </div>
-      </div>
-      <div className="body__songs">
-        <div className="body__icons">
-          this is where stuff will be
-          {/* <PlayCircleFilled className="body__shuffle" />
-        <Favorite fontSize="large" />
-        <MoreHoriz /> */}
-        </div>
-        this is for other stuff
-        {tracks.name ?
-          tracks.track.map((track) => {
-            <SongRow track={track} />
-          })
-          :
-          <></>
-        }
-        add styling and search and list for songs
-        add current user to top right header
-      </div>
-    </Grid>
+        {/* List songs from search results */}
+        <Grid item>
+          {tracks.length > 0 ?
+            tracks.map((track) => {
+              return <SongRow track={track} key={track.id} onAddTrack={handleAddTrack} />
+            })
+            :
+            <></>
+          }
+        </Grid>
+
+      </Grid>
+    </>
   )
 }
 

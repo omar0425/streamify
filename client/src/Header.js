@@ -1,6 +1,7 @@
 //functional imports
 import React, { useContext, useState } from "react";
 import { SpotifyContext } from "./SpotifyContext";
+import { useNavigate } from 'react-router-dom';
 
 // imports styles and components
 import "./Header.css";
@@ -28,9 +29,14 @@ import Paper from '@mui/material/Paper';
 
 
 function Header() {
-
+  // setting state for search field
   const [search, setSearch] = useState("")
+  const navigate = useNavigate();
 
+  // brings state from context
+  const { localUser, setLocalUser, setIsAuthenticated } = useContext(SpotifyContext);
+
+  //updates the search value to state
   function handleChange(e) {
     setSearch(e.target.value)
   }
@@ -44,7 +50,6 @@ function Header() {
     //   .then((r) => r.json())
     //   .then((results) => console.log(results))
   }
-  const { setUser, setIsAuthenticated } = useContext(SpotifyContext);
 
   //passed back from Navbar and removes the current user for logout
   function handleLogout() {
@@ -52,7 +57,7 @@ function Header() {
       { method: "DELETE" })
       .then((res) => {
         if (res.ok) {
-          setUser({})
+          setLocalUser({})
           setIsAuthenticated(false)
         }
         setAnchorEl(null)
@@ -115,18 +120,17 @@ function Header() {
 
   //handles rendering the profile page
   function handleMyProfile () {
-    console.log('handling my profile')
+    navigate('/profile')
     setAnchorEl(null);
   }
   
-  
+
   return (
   
       <div className='header'>
         <div className='header__left'>
           <form onSubmit={handleSubmit}>
             <Paper
-              component="form"
               elevation={0}
               sx={{ display: 'flex', alignItems: 'center', width: 500 }}
             >
@@ -138,8 +142,13 @@ function Header() {
                 value={search}
                 onChange={handleChange}
               />
-              <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
-                <SearchIcon onClick={handleSubmit} />
+              <IconButton 
+                type="button" 
+                sx={{ p: '10px' }} 
+                aria-label="search"
+                onClick={handleSubmit}
+              >
+                <SearchIcon />
               </IconButton>
             </Paper>
           </form>
@@ -156,9 +165,13 @@ function Header() {
             disableElevation
             onClick={handleClick}
             endIcon={<KeyboardArrowDownIcon />}
+            sx={{textTransform: 'none'}}
           >
-            <Avatar className="Avatar" />
-            Name
+            <Avatar 
+              className="Avatar" 
+              src= {localUser.avatar_url}
+            />
+            {localUser.username}
           </Button>
           <StyledMenu
             id="demo-customized-menu"
