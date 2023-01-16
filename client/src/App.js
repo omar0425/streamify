@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { SpotifyContext } from "./SpotifyContext";
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
+import CssBaseline from "@mui/material/CssBaseline";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 
 // importing components and css
 import "./App";
@@ -18,7 +18,7 @@ import LoginToSpotify from "./LoginToSpotify";
 import Navbar from "./components/Navbar";
 import Player from "./Player";
 import Playlist from "./Playlist";
-import Body from "./Body"
+import Body from "./Body";
 
 // importing material ui components
 import Search from "@mui/icons-material/Search";
@@ -26,7 +26,7 @@ import Search from "@mui/icons-material/Search";
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
-  const [currentPlaylist, setCurrentPlaylist] = useState({})
+  const [currentPlaylist, setCurrentPlaylist] = useState({});
 
   // checks the browser session for a logged in user and automatically logs them in
   useEffect(() => {
@@ -50,30 +50,35 @@ const App = () => {
   return (
     <Router>
       <SpotifyContext.Provider
-        value={{ isAuthenticated, setIsAuthenticated, user, setUser, currentPlaylist, setCurrentPlaylist }}
+        value={{
+          isAuthenticated,
+          setIsAuthenticated,
+          user,
+          setUser,
+          currentPlaylist,
+          setCurrentPlaylist,
+        }}
       >
         <Grid container>
-
-          <Grid item >
+          <Grid item>
             <Navbar />
           </Grid>
 
-          <Grid item sx={{flexGrow: 1}}>
+          <Grid item sx={{ flexGrow: 1 }}>
             <Header />
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path='/' element={<Home />} />
               {/* <Route path='/search' element={<Search />} /> */}
-              <Route path="/playlists/:id" element={<Playlist />} />
+              <Route path='/playlists/:id' element={<Playlist />} />
               {/* <Route path='/collection/' element={<CollectionHeader />} >
                 <Route path='playlists' element={<Playlists />} />
                 <Route path='songs' element={<Songs />} />
-              </Route> */}              
+              </Route> */}
             </Routes>
           </Grid>
         </Grid>
 
         {/* <Footer /> */}
-
       </SpotifyContext.Provider>
     </Router>
   );
