@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
     user = User.find_by!(username: user_params[:username])
     if user&.authenticate(user_params[:password])
       session[:user_id] = user.id
-      render json: user, status: 201
+      render json: user, include: ['playlists', 'playlists.songs'], status: 201
     else
       render json: { errors: ["Username or Password is incorrect"] }, status: :unprocessable_entity
     end
@@ -22,13 +22,23 @@ class SessionsController < ApplicationController
   def show
     if session[:user_id]
       user = User.find(session[:user_id])
-      render json: user, status: :ok
+      render json: user, include: ['playlists', 'playlists.songs'], status: :ok
     end
   end
 
   #the user in the sessions will be logged out
   # sessions#logout
   def destroy
+    user = User.find(session[:user_id])
+    user.update!(
+      spotify_token: '',
+      spotify_refresh_token: '',
+      spotify_token_lifetime: '',
+      spotify_display_name: '',
+      spotify_email: '',
+      spotify_id: '',
+      spotify_img: ''
+    )
     session[:user_id] = nil
     head :no_content
   end
