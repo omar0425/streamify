@@ -1,19 +1,27 @@
-import React from 'react'
+//functional imports
+import React, { useContext } from 'react'
+import { SpotifyContext } from "./SpotifyContext";
+
+//css and component imports
 import './SongRow.css'
 import './SidebarOption'
 
+//material ui imports
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import AddIcon from '@mui/icons-material/Add';
 
 function SongRow({ track, onAddTrack }) {
-  return (
+  //set state from context
+  const { setCurrentTrack } = useContext(SpotifyContext);
 
-    <Grid container className="songRow" width="700px">
+
+  return (
+    <Grid container className="songRow" width="1200px">
 
         <Grid item xs={1}>
-        <img src={track.album.images[0].url} alt="" className="songRow__album" />
+        <img src={track.album.images[0].url} alt={track.album.name} className="songRow__album" />
         </Grid>
 
         <Grid item xs={8}>
@@ -28,6 +36,7 @@ function SongRow({ track, onAddTrack }) {
 
       <Grid item xs={3}>
         <Button 
+          onClick={() => {setCurrentTrack(track)}}
           className='sidebarOption'
           sx={{
             color: 'grey',
@@ -41,7 +50,7 @@ function SongRow({ track, onAddTrack }) {
           <h4>Track</h4>
         </Button>
         <Button 
-          onClick={() => {onAddTrack(track)}} 
+          onClick={(e) => {onAddTrack(track, e)}} 
           className='sidebarOption'
           sx={{
             color: 'grey',
@@ -63,3 +72,4 @@ function SongRow({ track, onAddTrack }) {
 }
 
 export default SongRow
+
