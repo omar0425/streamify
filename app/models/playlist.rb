@@ -1,5 +1,7 @@
 class Playlist < ApplicationRecord
-  has_many :songs
-  has_many :albums
-  has_many :playlists, through: :songs
+  #establishes relationship to other models
+belongs_to :user
+has_many :songs, dependent: :destroy
+has_many :artists, through: :songs
+has_many :albums, through: :songs
 end

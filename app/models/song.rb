@@ -1,6 +1,6 @@
 class Song < ApplicationRecord
-  belongs_to :playlists
-  belongs_to :albums
-  belongs_to :artists
-  validates :year, numericality: { minimum: 1300, maximum: 2024 }
+  #establishes relationship to other models
+  belongs_to :playlist
+  belongs_to :album
+  belongs_to :artist
 end

@@ -10,7 +10,7 @@ class UsersController < ApplicationController
   def create
     user = User.create!(user_params)
     session[:user_id] = user.id
-    render json: user, status: :created
+    render json: user, include: ['playlists', 'playlists.songs'], status: :created
   end
 
   #private methods for users_controller
@@ -18,7 +18,7 @@ class UsersController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def user_params
-    params.permit(:username, :password, :password_confirmation)
+    params.permit(:username, :password, :password_confirmation, :avatar_url)
   end
 
   #returns the errors in case the exceptions are raised
