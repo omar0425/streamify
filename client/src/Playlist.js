@@ -7,7 +7,7 @@ import { SpotifyContext } from "./SpotifyContext";
 import "./Body.css";
 import "./App.css";
 import SongRow from "./SongRow";
-import PlaylistSongRow from "./PlayListSongRow";
+import PlaylistSongRow from "./PlaylistSongRow";
 
 //material ui imports
 import Button from '@mui/material/Button';

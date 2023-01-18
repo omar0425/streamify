@@ -10,4 +10,3 @@ function SidebarOption({ title }) {
 }
 
 export default SidebarOption;
-
