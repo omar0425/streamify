@@ -3,8 +3,11 @@ class CreateArtists < ActiveRecord::Migration[7.0]
     create_table :artists do |t|
       t.string "name"
       t.string "genres"
-      t.string "hometown"
-      t.timestamps
+      t.datetime "created_at", null: false
+      t.datetime "updated_at", null: false
+      t.string "image_url"
+      t.string "spotify_id"
+      t.integer "followers"
     end
   end
 end

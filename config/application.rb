@@ -24,7 +24,7 @@ module Streamify
     config.load_defaults 7.0
 
     # Configuration for the application, engines, and railties goes here.
-    #
+    RSpotify::authenticate(Rails.application.credentials.spotify.client_id, Rails.application.credentials.spotify.client_secret)
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #

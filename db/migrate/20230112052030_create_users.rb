@@ -6,7 +6,16 @@ class CreateUsers < ActiveRecord::Migration[7.0]
       t.string "password_digest"
       t.text "birthdate"
       t.string "region"
-      t.timestamps
+      t.datetime "created_at", null: false
+      t.datetime "updated_at", null: false
+      t.string "avatar_url"
+      t.string "spotify_token"
+      t.string "spotify_refresh_token"
+      t.string "spotify_display_name"
+      t.string "spotify_email"
+      t.string "spotify_id"
+      t.string "spotify_img"
+      t.integer "spotify_token_lifetime"
     end
   end
 end
