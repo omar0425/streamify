@@ -5,11 +5,10 @@ import App from "./App";
 
   // sets the style of the background image
   const backgroundStyle = {
-    background: 'linear-gradient(rgb(91, 87, 115), black',
-    height: '100vh',
-    width: '100vw',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
+    background: 'linear-gradient(217deg, rgba(0,0,0,.8), rgba(0,0,0,0) 99%), linear-gradient(127deg, rgba(0,0,0,.8), rgba(20, 20, 20,0) 99%), linear-gradient(336deg, rgba(20, 20, 20,.8), rgba(20, 20, 20,0) 99%)',
+    // minHeight: '75em',
+    height: 'auto',
+    width: 'auto',
   };
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
