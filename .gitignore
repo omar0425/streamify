@@ -30,8 +30,8 @@
 /config/credentials/development.key
 /config/credentials/development.yml.enc
 
-/config/credentials/production.key
-/config/credentials/production.yml.enc
+# /config/credentials/production.key
+# /config/credentials/production.yml.enc
 
 
 node_modules
