@@ -45,7 +45,8 @@ end
 
 # DELETE /songs/1
 def destroy
-  @song.destroy
+  song = Song.find(params[:id]).destroy
+  render json: {}, status: :accepted
 end
 
 private
@@ -66,3 +67,4 @@ private
   end
 
 end
+
