@@ -80,7 +80,11 @@ function Footer() {
     }
     if (audioElem.current.duration === audioElem.current.currentTime && repeat) {
       nextSong()
-    }
+}
+    if (audioElem.current.duration === audioElem.current.currentTime && shuffle) {
+      nextSong()
+}
+
   }
 
   console.log("currentTrack", currentTrack)

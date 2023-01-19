@@ -1,6 +1,6 @@
 //functional imports
 import React, { useState, useContext, useEffect } from "react";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from "react-router-dom";
 import { SpotifyContext } from "../SpotifyContext";
 
 // css and component imports
@@ -8,25 +8,23 @@ import "../Body.css";
 import "../App.css";
 
 //material ui imports
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Grid from '@mui/material/Grid';
-import InputAdornment from '@mui/material/InputAdornment';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import InputBase from '@mui/material/InputBase';
-import ClearIcon from '@mui/icons-material/Clear';
-import SearchIcon from '@mui/icons-material/Search';
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-
-
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import Grid from "@mui/material/Grid";
+import InputAdornment from "@mui/material/InputAdornment";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import InputBase from "@mui/material/InputBase";
+import ClearIcon from "@mui/icons-material/Clear";
+import SearchIcon from "@mui/icons-material/Search";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
 
 function Profile() {
   // sets state, params, navigate and context
@@ -144,13 +142,32 @@ function Profile() {
   //   })
   //   handleCloseDeleteMenu()
   // }
-  
+
+  // //handles the search submit
+  // function handleSearchSubmit(e) {
+  //   console.log("event from search submit", e)
+  //   console.log("handle search submit firing")
+  //   e.preventDefault()
+  //   fetch(`/spotify_api/songs/${search}`)
+  //     .then((res) => {
+  //       if (res.ok) {
+  //         res.json().then((tracks) => {
+  //           setTracks(tracks)
+  //         })
+  //       } else {
+  //         res.json().then((err) => {
+  //           setErrors(err.error)
+  //         });
+  //       }
+  //     })
+  //     setSearch('')
+  //   }
 
   //   //updates the form in state with the changed input values from the form
   //   function handleDialogUpdate(e) {
   //     setForm({ ...form, [e.target.name]: e.target.value })
   //   }
-  
+
   //   //handles opening and closing the form
   //   const handleClickOpen = () => {
   //     setOpen(true);
@@ -182,52 +199,48 @@ function Profile() {
   //   setForm({ ...form, [val]: '' })
   // }
 
-
   return (
     <>
-
-    <Grid container className="body">
-      <div className="body__info">
-
-        <Grid container >
-
-        <Grid item xs={4}>
-          <img className="profile_image_class" src={localUser.avatar_url} alt={localUser.username} />
-        </Grid>
-        <Grid item xs={8} className="body__infoText" >
-          <p>{localUser.username}</p>
-          <p>{localUser.birthdate}</p>
-          <p>{localUser.region}</p>
-          <p>{localUser.email}</p>
-        </Grid>
-        </Grid>
-
-        <Grid Container>
-
-        {localUser.spotify_token ? 
-          <>
-            <Grid item>
-              <img className="profile_image_class" src={localUser.spotify_img} alt={`${localUser.username}'s avatar unavailable`} />
+      <Grid container className='body'>
+        <div className='body__info'>
+          <Grid container>
+            <Grid item xs={4}>
+              <img
+                className='profile_image_class'
+                src={localUser.avatar_url}
+                alt={localUser.username}
+              />
             </Grid>
-            <Grid item className="body__infoText" >
+            <Grid item xs={8} className='body__infoText'>
+              <p>{localUser.username}</p>
+              <p>{localUser.birthdate}</p>
+              <p>{localUser.region}</p>
+              <p>{localUser.email}</p>
+            </Grid>
+          </Grid>
+
+          <Grid Container>
+            <Grid item>
+              <img
+                className='profile_image_class'
+                src={localUser.spotify_img}
+                alt={localUser.username}
+              />
+            </Grid>
+            <Grid item className='body__infoText'>
               <h4>Associated Spotify account details :</h4>
-              <p>{`Remaining minutes for this session: ${Math.floor((localUser.spotify_token_lifetime - Date.now()/1000)/60)}`}</p>
+              <p>{`Remaining minutes for this session: ${Math.floor(
+                (localUser.spotify_token_lifetime - Date.now() / 1000) / 60
+              )}`}</p>
               <p>{`Spotify display name: ${localUser.spotify_display_name}`}</p>
               <p>{`Spotify Id: ${localUser.spotify_id}`}</p>
               <p>{`Spotify email: ${localUser.spotify_email}`}</p>
             </Grid>
-          </>
-        :
-        <p>Login with Spotify using the link in the navigation bar!</p>
-        }
+          </Grid>
 
-
-        </Grid>
-
-
-        {/* dialog for update menu */}
-        <div>
-          {/* <Dialog
+          {/* dialog for update menu */}
+          <div>
+            {/* <Dialog
             open={open}
             onClose={handleClose}
             sx={{ backgroundColor: 'transparent' }}
@@ -315,15 +328,15 @@ function Profile() {
               >Save</Button>
             </DialogActions>
           </Dialog> */}
+          </div>
         </div>
-      </div>
-    </Grid>
+      </Grid>
 
-    {/* delete icon and menu */}
-    <Grid container>
-      <Grid item>
-        <div>
-          {/* <IconButton
+      {/* delete icon and menu */}
+      <Grid container>
+        <Grid item>
+          <div>
+            {/* <IconButton
             aria-label="more"
             id="long-button"
             aria-controls={openDeletePlaylist ? 'long-menu' : undefined}
@@ -353,14 +366,11 @@ function Profile() {
               Delete Playlist
             </MenuItem>
           </Menu> */}
-        </div>
-
-
+          </div>
+        </Grid>
       </Grid>
-
-    </Grid>
-  </>
-  )
+    </>
+  );
 }
 
-export default Profile
+export default Profile;

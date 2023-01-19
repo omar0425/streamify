@@ -12,3 +12,4 @@ class Artist < ApplicationRecord
       followers: artist.followers['total']
     )
   end
+end
